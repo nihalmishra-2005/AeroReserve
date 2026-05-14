@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Manage Seats | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo"><i class="bi bi-airplane-fill"></i><span>AirReserve<br/><small>Admin</small></span></div>
+        <nav class="sidebar-nav">
+            <a href="/admin/dashboard" class="sidebar-link"><i class="bi bi-grid-1x2-fill"></i>Dashboard</a>
+            <a href="/admin/flights" class="sidebar-link active"><i class="bi bi-airplane-fill"></i>Flights</a>
+            <a href="/admin/bookings" class="sidebar-link"><i class="bi bi-ticket-perforated-fill"></i>Bookings</a>
+            <a href="/admin/users" class="sidebar-link"><i class="bi bi-people-fill"></i>Users</a>
+        </nav>
+    </aside>
+    <main class="admin-main">
+        <div class="admin-topbar">
+            <div>
+                <h2 class="admin-page-title">Seat Inventory</h2>
+                <p class="admin-page-sub" th:text="${flight.flightNumber + ' — ' + flight.sourceCity + ' → ' + flight.destinationCity}"></p>
+            </div>
+            <a href="/admin/flights" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4" th:each="classType : ${ {'Economy','Business','First'} }">
+                <div class="kpi-card kpi-blue">
+                    <div class="kpi-data">
+                        <div class="kpi-val" th:text="${seats.stream().filter(s -> s.classType.name() == classType).filter(s -> !s.isBooked).count()}">0</div>
+                        <div class="kpi-label" th:text="${classType + ' Available'}"></div>
+                    </div>
+                    <div class="kpi-data">
+                        <div class="kpi-val" th:text="${seats.stream().filter(s -> s.classType.name() == classType).filter(s -> s.isBooked).count()}">0</div>
+                        <div class="kpi-label" th:text="${classType + ' Booked'}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-card-body">
+                <div class="table-responsive">
+                    <table class="table ar-table">
+                        <thead><tr><th>Seat #</th><th>Class</th><th>Price</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr th:each="s : ${seats}">
+                                <td><strong th:text="${s.seatNumber}"></strong></td>
+                                <td><span class="class-badge" th:classappend="${'class-'+s.classType}" th:text="${s.classType}"></span></td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(s.price,1,0)}"></td>
+                                <td>
+                                    <span th:if="${s.isBooked}" class="status-badge status-cancelled">Booked</span>
+                                    <span th:unless="${s.isBooked}" class="status-badge status-confirmed">Available</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

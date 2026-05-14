@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Search Flights')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container py-5">
+  <!-- Page Header -->
+  <div class="mb-5">
+    <div class="section-title">✈ FLIGHT SEARCH</div>
+    <h2 class="fw-bold">Find Your <span style="color:#00d4ff;">Perfect Flight</span></h2>
+  </div>
+
+  <!-- Search Form -->
+  <div class="card-glass p-4 mb-5">
+    <form action="/flights/search" method="get">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label-dark"><i class="bi bi-geo-alt-fill me-1" style="color:#00d4ff;"></i>FROM</label>
+          <input type="text" name="source" class="form-control form-control-dark"
+                 th:value="${source}" placeholder="Departure city" list="cityList" required/>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label-dark"><i class="bi bi-geo-fill me-1" style="color:#ff6b35;"></i>TO</label>
+          <input type="text" name="destination" class="form-control form-control-dark"
+                 th:value="${destination}" placeholder="Destination city" list="cityList" required/>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label-dark"><i class="bi bi-calendar3 me-1"></i>DATE</label>
+          <input type="date" name="date" class="form-control form-control-dark"
+                 th:value="${date}" required/>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-accent w-100 py-3">
+            <i class="bi bi-search me-2"></i>Search
+          </button>
+        </div>
+      </div>
+      <datalist id="cityList">
+        <option th:each="city : ${cities}" th:value="${city}"/>
+      </datalist>
+    </form>
+  </div>
+
+  <!-- Route Visual -->
+  <div th:if="${searched and source != null}" class="route-visual mb-4">
+    <div class="route-city">
+      <div class="code" th:text="${source}">DEL</div>
+      <div class="name">Departure</div>
+    </div>
+    <div class="route-line">
+      <span class="route-plane">✈</span>
+    </div>
+    <div class="route-city">
+      <div class="code" th:text="${destination}">BOM</div>
+      <div class="name">Destination</div>
+    </div>
+  </div>
+
+  <!-- Results Count -->
+  <div th:if="${searched and !noFlights}" class="mb-4 d-flex align-items-center justify-content-between">
+    <p class="text-muted mb-0">
+      <span class="fw-bold" style="color:#00d4ff;" th:text="${flights.size()}">0</span>
+      flights found on
+      <span th:text="${#temporals.format(date, 'dd MMM yyyy')}"></span>
+    </p>
+    <span class="badge px-3 py-2 rounded-pill" style="background:rgba(0,212,255,0.1);color:#00d4ff;">
+      Sorted by Departure Time
+    </span>
+  </div>
+
+  <!-- No Flights Message -->
+  <div th:if="${noFlights}" class="text-center py-5">
+    <div style="font-size:4rem;margin-bottom:1rem;">✈</div>
+    <h4 class="fw-bold text-muted">No flights available</h4>
+    <p class="text-muted">Try different dates or locations</p>
+  </div>
+
+  <!-- Flight Cards -->
+  <div th:if="${flights != null and !flights.isEmpty()}">
+    <div th:each="flight : ${flights}" class="flight-card mb-3">
+      <div class="row align-items-center">
+        <!-- Airline Info -->
+        <div class="col-md-2">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span style="font-size:1.5rem;">✈</span>
+            <div>
+              <div class="fw-bold small" th:text="${flight.airlineName}">SkyWings</div>
+              <div class="badge rounded-pill px-2" style="background:rgba(0,212,255,0.1);color:#00d4ff;font-size:0.7rem;"
+                   th:text="${flight.flightNumber}">SW-101</div>
+            </div>
+          </div>
+          <small class="text-muted" th:text="${flight.aircraftType}">Boeing 737</small>
+        </div>
+
+        <!-- Departure -->
+        <div class="col-md-2 text-center">
+          <div class="fs-4 fw-bold" style="font-family:'Orbitron',sans-serif;"
+               th:text="${#temporals.format(flight.departureTime, 'HH:mm')}">09:00</div>
+          <div class="fw-bold" th:text="${flight.sourceCity}">Delhi</div>
+          <div class="badge px-2 rounded-pill" style="background:rgba(255,255,255,0.05);color:#8892b0;font-size:0.7rem;"
+               th:text="${flight.sourceAirportCode}">DEL</div>
+        </div>
+
+        <!-- Duration -->
+        <div class="col-md-2 text-center">
+          <div class="text-muted small" th:text="${flight.formattedDuration}">2h 0m</div>
+          <div class="d-flex align-items-center gap-1 my-1">
+            <div style="flex:1;height:2px;background:rgba(0,212,255,0.3);border-radius:1px;"></div>
+            <span style="color:#00d4ff;font-size:0.9rem;">✈</span>
+            <div style="flex:1;height:2px;background:rgba(0,212,255,0.3);border-radius:1px;"></div>
+          </div>
+          <div class="text-muted small">Direct</div>
+        </div>
+
+        <!-- Arrival -->
+        <div class="col-md-2 text-center">
+          <div class="fs-4 fw-bold" style="font-family:'Orbitron',sans-serif;"
+               th:text="${#temporals.format(flight.arrivalTime, 'HH:mm')}">11:00</div>
+          <div class="fw-bold" th:text="${flight.destinationCity}">Mumbai</div>
+          <div class="badge px-2 rounded-pill" style="background:rgba(255,255,255,0.05);color:#8892b0;font-size:0.7rem;"
+               th:text="${flight.destinationAirportCode}">BOM</div>
+        </div>
+
+        <!-- Seats & Status -->
+        <div class="col-md-2 text-center">
+          <div class="mb-2">
+            <span class="badge badge-confirmed px-3 py-2 rounded-pill"
+                  th:text="${flight.availableSeats} + ' seats left'">150 seats left</span>
+          </div>
+          <div class="text-muted small"
+               th:text="${flight.status}">SCHEDULED</div>
+        </div>
+
+        <!-- Price & Book -->
+        <div class="col-md-2 text-end">
+          <div class="price-tag fs-4" th:text="'₹' + ${#numbers.formatDecimal(flight.basePrice, 0, 0)}">₹4500</div>
+          <div class="text-muted small mb-2">Economy onwards</div>
+          <a th:href="@{/flights/{id}/seats(id=${flight.id})}"
+             class="btn btn-accent btn-sm px-4 py-2"
+             sec:authorize="isAuthenticated()">
+            <i class="bi bi-ticket me-1"></i>Book Now
+          </a>
+          <a href="/auth/login" class="btn btn-accent btn-sm px-4 py-2"
+             sec:authorize="!isAuthenticated()">
+            Login to Book
+          </a>
+        </div>
+      </div>
+
+      <!-- Class Pricing Row -->
+      <div class="row mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.05);">
+        <div class="col-4 text-center">
+          <span class="badge badge-economy px-3 py-2 rounded-pill">
+            Economy: ₹<span th:text="${#numbers.formatDecimal(flight.basePrice, 0, 0)}"></span>
+          </span>
+        </div>
+        <div class="col-4 text-center">
+          <span class="badge badge-business px-3 py-2 rounded-pill">
+            Business: ₹<span th:text="${#numbers.formatDecimal(flight.basePrice.multiply(T(java.math.BigDecimal).valueOf(1.5)), 0, 0)}"></span>
+          </span>
+        </div>
+        <div class="col-4 text-center">
+          <span class="badge badge-first px-3 py-2 rounded-pill">
+            First Class: ₹<span th:text="${#numbers.formatDecimal(flight.basePrice.multiply(T(java.math.BigDecimal).valueOf(2.5)), 0, 0)}"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

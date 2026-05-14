@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Booking Confirmed | AirReserve</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg ar-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard"><span class="brand-icon"><i class="bi bi-airplane-fill"></i></span><span class="brand-text">Air<span class="brand-accent">Reserve</span></span></a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/bookings/history">My Bookings</a></li>
+                <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="confirmation-wrapper">
+        <!-- SUCCESS ANIMATION -->
+        <div class="confirm-success-icon">
+            <div class="success-circle">
+                <i class="bi bi-check-lg"></i>
+            </div>
+        </div>
+        <h1 class="confirm-title">Booking Confirmed! 🎉</h1>
+        <p class="confirm-subtitle">Your ticket has been booked successfully. Have a great flight!</p>
+
+        <!-- TICKET CARD -->
+        <div class="ticket-card">
+            <div class="ticket-top">
+                <div class="ticket-airline">
+                    <i class="bi bi-airplane-fill me-2"></i>
+                    <span th:text="${booking.flight.airlineName}">AirReserve</span>
+                    <span class="ticket-flight-num ms-2" th:text="${booking.flight.flightNumber}"></span>
+                </div>
+                <div class="ticket-ref">
+                    <span class="ref-label">Booking Ref</span>
+                    <span class="ref-val" th:text="${booking.bookingRef}">AR12345678</span>
+                </div>
+            </div>
+
+            <div class="ticket-route">
+                <div class="ticket-city">
+                    <div class="t-code" th:text="${booking.flight.sourceCode}">DEL</div>
+                    <div class="t-city" th:text="${booking.flight.sourceCity}">New Delhi</div>
+                    <div class="t-time" th:text="${#temporals.format(booking.flight.departureTime,'HH:mm')}">10:00</div>
+                    <div class="t-date" th:text="${#temporals.format(booking.flight.departureTime,'dd MMM yyyy')}"></div>
+                </div>
+                <div class="ticket-path">
+                    <div class="tp-duration" th:text="${booking.flight.durationFormatted}">2h 5m</div>
+                    <div class="tp-line">
+                        <span class="tp-dot"></span>
+                        <div class="tp-bar"><i class="bi bi-airplane-fill tp-plane"></i></div>
+                        <span class="tp-dot"></span>
+                    </div>
+                    <div class="tp-nonstop">Non-stop</div>
+                </div>
+                <div class="ticket-city text-end">
+                    <div class="t-code" th:text="${booking.flight.destinationCode}">BOM</div>
+                    <div class="t-city" th:text="${booking.flight.destinationCity}">Mumbai</div>
+                    <div class="t-time" th:text="${#temporals.format(booking.flight.arrivalTime,'HH:mm')}">12:05</div>
+                    <div class="t-date" th:text="${#temporals.format(booking.flight.arrivalTime,'dd MMM yyyy')}"></div>
+                </div>
+            </div>
+
+            <div class="ticket-divider">
+                <div class="ticket-circle-left"></div>
+                <div class="ticket-dashes"></div>
+                <div class="ticket-circle-right"></div>
+            </div>
+
+            <div class="ticket-bottom">
+                <div class="tb-detail">
+                    <span class="tb-label">Passenger</span>
+                    <span class="tb-val" th:text="${booking.passengerName}"></span>
+                </div>
+                <div class="tb-detail">
+                    <span class="tb-label">Seat</span>
+                    <span class="tb-val tb-seat" th:text="${booking.seat.seatNumber}"></span>
+                </div>
+                <div class="tb-detail">
+                    <span class="tb-label">Class</span>
+                    <span class="tb-val"><span class="class-badge" th:classappend="${'class-'+booking.classType}" th:text="${booking.classType}"></span></span>
+                </div>
+                <div class="tb-detail">
+                    <span class="tb-label">Amount</span>
+                    <span class="tb-val tb-amount" th:text="'₹' + ${#numbers.formatDecimal(booking.amountPaid,1,2)}"></span>
+                </div>
+                <div class="tb-detail">
+                    <span class="tb-label">Status</span>
+                    <span class="status-badge status-confirmed">CONFIRMED</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="confirm-actions mt-4">
+            <a href="/bookings/history" class="btn btn-ar-primary me-3">
+                <i class="bi bi-ticket-perforated me-2"></i>View All Bookings
+            </a>
+            <a href="/flights/search" class="btn btn-outline-primary">
+                <i class="bi bi-search me-2"></i>Book Another Flight
+            </a>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Select Seat | AirReserve</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg ar-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard"><span class="brand-icon"><i class="bi bi-airplane-fill"></i></span><span class="brand-text">Air<span class="brand-accent">Reserve</span></span></a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/flights/search"><i class="bi bi-arrow-left me-1"></i>Back to Search</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <!-- FLIGHT SUMMARY BAR -->
+    <div class="flight-summary-bar mb-4">
+        <div class="fsb-route">
+            <span class="fsb-code" th:text="${flight.sourceCode}">DEL</span>
+            <div class="fsb-path"><i class="bi bi-airplane-fill"></i></div>
+            <span class="fsb-code" th:text="${flight.destinationCode}">BOM</span>
+        </div>
+        <div class="fsb-info">
+            <div class="fsb-detail"><i class="bi bi-clock me-1"></i><span th:text="${#temporals.format(flight.departureTime,'dd MMM · HH:mm')}"></span></div>
+            <div class="fsb-detail"><i class="bi bi-tag-fill me-1"></i><span th:text="${flight.flightNumber}"></span></div>
+            <div class="fsb-detail"><i class="bi bi-hourglass-split me-1"></i><span th:text="${flight.durationFormatted}"></span></div>
+        </div>
+        <div class="fsb-price">
+            <span class="fsb-price-label">Price per seat</span>
+            <span class="fsb-price-val" th:text="'₹' + ${#numbers.formatDecimal(price, 1, 2)}"></span>
+            <span class="fsb-class-badge" th:text="${selectedClass}"></span>
+        </div>
+    </div>
+
+    <!-- CLASS SELECTOR TABS -->
+    <div class="class-tabs mb-4">
+        <a th:href="@{/flights/{id}/seats(id=${flight.id}, classType='Economy')}"
+           class="class-tab" th:classappend="${selectedClass == 'Economy' ? ' class-tab-active' : ''}">
+            <i class="bi bi-person me-1"></i>Economy
+            <span class="class-tab-price" th:text="'₹' + ${#numbers.formatDecimal(flight.basePrice, 1, 0)}"></span>
+        </a>
+        <a th:href="@{/flights/{id}/seats(id=${flight.id}, classType='Business')}"
+           class="class-tab" th:classappend="${selectedClass == 'Business' ? ' class-tab-active' : ''}">
+            <i class="bi bi-briefcase me-1"></i>Business
+            <span class="class-tab-price" th:text="'₹' + ${#numbers.formatDecimal(flight.basePrice.multiply(1.75), 1, 0)}"></span>
+        </a>
+        <a th:href="@{/flights/{id}/seats(id=${flight.id}, classType='First')}"
+           class="class-tab" th:classappend="${selectedClass == 'First' ? ' class-tab-active' : ''}">
+            <i class="bi bi-star me-1"></i>First Class
+            <span class="class-tab-price" th:text="'₹' + ${#numbers.formatDecimal(flight.basePrice.multiply(2.8), 1, 0)}"></span>
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- SEAT MAP -->
+        <div class="col-lg-8">
+            <div class="seat-map-card">
+                <div class="seat-map-header">
+                    <h5 class="seat-map-title"><i class="bi bi-grid-3x3 me-2"></i>Seat Map — <span th:text="${selectedClass}">Economy</span></h5>
+                    <div class="seat-legend">
+                        <span class="legend-item"><span class="seat-dot seat-dot-available"></span>Available</span>
+                        <span class="legend-item"><span class="seat-dot seat-dot-booked"></span>Booked</span>
+                        <span class="legend-item"><span class="seat-dot seat-dot-selected"></span>Selected</span>
+                    </div>
+                </div>
+                <!-- AIRCRAFT NOSE -->
+                <div class="aircraft-nose"><i class="bi bi-airplane-fill"></i></div>
+                <!-- COLUMN HEADERS -->
+                <div class="seat-col-headers" th:if="${selectedClass == 'Economy'}">
+                    <span>A</span><span>B</span><span>C</span><span class="aisle-gap"></span><span>D</span><span>E</span><span>F</span>
+                </div>
+                <div class="seat-col-headers" th:unless="${selectedClass == 'Economy'}">
+                    <span>A</span><span>B</span><span class="aisle-gap"></span><span>C</span><span>D</span>
+                </div>
+
+                <!-- SEAT GRID -->
+                <div class="seat-grid" th:classappend="${selectedClass == 'Economy' ? ' seat-grid-eco' : ' seat-grid-prem'}">
+                    <div th:each="seat : ${seats}"
+                         class="seat-btn"
+                         th:classappend="${seat.isBooked ? ' seat-booked' : ' seat-available'}"
+                         th:attr="data-seat-id=${seat.id}, data-seat-num=${seat.seatNumber}, data-price=${seat.price}"
+                         th:title="${seat.seatNumber + ' - ' + (seat.isBooked ? 'Booked' : 'Available')}">
+                        <span th:text="${seat.seatNumber}" class="seat-label"></span>
+                    </div>
+                </div>
+                <div class="aircraft-tail"><div class="tail-bar"></div></div>
+            </div>
+        </div>
+
+        <!-- BOOKING SIDEBAR -->
+        <div class="col-lg-4">
+            <div class="booking-sidebar sticky-top" style="top: 80px;">
+                <div class="sidebar-header">
+                    <h5>Booking Summary</h5>
+                </div>
+                <div class="sidebar-body" id="sidebarBody">
+                    <div class="no-seat-selected">
+                        <i class="bi bi-hand-index-thumb"></i>
+                        <p>Select a seat from the map to continue</p>
+                    </div>
+                </div>
+                <div class="sidebar-footer" id="sidebarFooter" style="display:none;">
+                    <a id="proceedBtn" href="#" class="btn btn-ar-primary w-100">
+                        <i class="bi bi-arrow-right-circle me-2"></i>Proceed to Book
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+const flightId = /*[[${flight.id}]]*/ 0;
+const flightNum = /*[[${flight.flightNumber}]]*/ '';
+const fromCity = /*[[${flight.sourceCity}]]*/ '';
+const toCity = /*[[${flight.destinationCity}]]*/ '';
+const selectedClass = /*[[${selectedClass}]]*/ 'Economy';
+
+let selectedSeatId = null;
+
+document.querySelectorAll('.seat-available').forEach(seat => {
+    seat.addEventListener('click', function() {
+        document.querySelectorAll('.seat-btn').forEach(s => s.classList.remove('seat-selected'));
+        this.classList.add('seat-selected');
+
+        selectedSeatId = this.dataset.seatId;
+        const seatNum = this.dataset.seatNum;
+        const price = parseFloat(this.dataset.price).toFixed(2);
+
+        document.getElementById('sidebarBody').innerHTML = `
+            <div class="sidebar-detail-row"><span class="sd-label">Flight</span><span class="sd-val">${flightNum}</span></div>
+            <div class="sidebar-detail-row"><span class="sd-label">Route</span><span class="sd-val">${fromCity} → ${toCity}</span></div>
+            <div class="sidebar-detail-row"><span class="sd-label">Class</span><span class="sd-val"><span class="class-badge class-${selectedClass}">${selectedClass}</span></span></div>
+            <div class="sidebar-detail-row"><span class="sd-label">Seat</span><span class="sd-val seat-highlight">${seatNum}</span></div>
+            <div class="sidebar-detail-row sidebar-price-row"><span class="sd-label">Total</span><span class="sd-val sd-price">₹${Number(price).toLocaleString('en-IN')}</span></div>
+        `;
+
+        document.getElementById('proceedBtn').href = `/flights/${flightId}/book/${selectedSeatId}`;
+        document.getElementById('sidebarFooter').style.display = 'block';
+    });
+});
+</script>
+</body>
+</html>

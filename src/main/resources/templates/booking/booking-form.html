@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Confirm Booking | AirReserve</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg ar-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard"><span class="brand-icon"><i class="bi bi-airplane-fill"></i></span><span class="brand-text">Air<span class="brand-accent">Reserve</span></span></a>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="booking-steps mb-4">
+        <div class="step step-done"><span>1</span> Search</div>
+        <div class="step-line"></div>
+        <div class="step step-done"><span>2</span> Select Seat</div>
+        <div class="step-line"></div>
+        <div class="step step-active"><span>3</span> Passenger Details</div>
+        <div class="step-line"></div>
+        <div class="step"><span>4</span> Confirmation</div>
+    </div>
+
+    <div class="row g-4">
+        <!-- PASSENGER FORM -->
+        <div class="col-lg-7">
+            <div class="section-card">
+                <div class="section-card-header">
+                    <h4 class="section-title"><i class="bi bi-person-lines-fill me-2"></i>Passenger Details</h4>
+                </div>
+                <div class="section-card-body">
+                    <form th:action="@{/flights/{fId}/book/{sId}(fId=${flight.id},sId=${seat.id})}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Full Name *</label>
+                            <input type="text" name="passengerName" class="form-control ar-input"
+                                   th:value="${user?.fullName}" required/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email Address *</label>
+                            <input type="email" name="passengerEmail" class="form-control ar-input"
+                                   th:value="${user?.email}" required/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Phone Number</label>
+                            <input type="tel" name="passengerPhone" class="form-control ar-input"
+                                   th:value="${user?.phone}" placeholder="+91 00000 00000"/>
+                        </div>
+
+                        <!-- PAYMENT MOCK -->
+                        <hr class="my-4"/>
+                        <h6 class="mb-3"><i class="bi bi-credit-card me-2"></i>Payment Details (Demo)</h6>
+                        <div class="mb-3">
+                            <input type="text" class="form-control ar-input" placeholder="Card Number: 4111 1111 1111 1111" maxlength="19"/>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col"><input type="text" class="form-control ar-input" placeholder="MM/YY"/></div>
+                            <div class="col"><input type="text" class="form-control ar-input" placeholder="CVV"/></div>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" class="form-control ar-input" placeholder="Name on Card"/>
+                        </div>
+
+                        <button type="submit" class="btn btn-ar-primary btn-lg w-100">
+                            <i class="bi bi-lock-fill me-2"></i>Confirm & Pay ₹<span th:text="${#numbers.formatDecimal(seat.price,1,2)}"></span>
+                        </button>
+                        <p class="text-muted text-center mt-2 small"><i class="bi bi-shield-check me-1"></i>Secure payment. Your data is protected.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOOKING SUMMARY -->
+        <div class="col-lg-5">
+            <div class="booking-summary-card">
+                <div class="bsc-header">
+                    <h5><i class="bi bi-receipt me-2"></i>Booking Summary</h5>
+                </div>
+                <div class="bsc-body">
+                    <!-- ROUTE VISUAL -->
+                    <div class="bsc-route">
+                        <div class="bsc-city">
+                            <div class="bsc-code" th:text="${flight.sourceCode}">DEL</div>
+                            <div class="bsc-cityname" th:text="${flight.sourceCity}">New Delhi</div>
+                            <div class="bsc-time" th:text="${#temporals.format(flight.departureTime,'HH:mm')}"></div>
+                        </div>
+                        <div class="bsc-path">
+                            <div class="bsc-duration" th:text="${flight.durationFormatted}"></div>
+                            <div class="bsc-line"><i class="bi bi-airplane-fill bsc-plane"></i></div>
+                        </div>
+                        <div class="bsc-city text-end">
+                            <div class="bsc-code" th:text="${flight.destinationCode}">BOM</div>
+                            <div class="bsc-cityname" th:text="${flight.destinationCity}">Mumbai</div>
+                            <div class="bsc-time" th:text="${#temporals.format(flight.arrivalTime,'HH:mm')}"></div>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="bsc-detail"><span>Flight</span><strong th:text="${flight.flightNumber}"></strong></div>
+                    <div class="bsc-detail"><span>Date</span><strong th:text="${#temporals.format(flight.departureTime,'dd MMM yyyy')}"></strong></div>
+                    <div class="bsc-detail"><span>Seat</span><strong th:text="${seat.seatNumber}"></strong></div>
+                    <div class="bsc-detail"><span>Class</span><strong><span class="class-badge" th:classappend="${'class-'+seat.classType}" th:text="${seat.classType}"></span></strong></div>
+                    <hr/>
+                    <div class="bsc-total"><span>Total Amount</span><strong th:text="'₹' + ${#numbers.formatDecimal(seat.price,1,2)}"></strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

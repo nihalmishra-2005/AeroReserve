@@ -1,0 +1,20 @@
+step 1: mvn clean install
+step 2: mvn spring-boot:run
+step3: open browser search http://localhost:8080/auth/login
+step 4 user :
+email: nihal@gmail.com
+psswd: admin123
+
+============search flights by these cities ------===
+
+Delhi → Mumbai
+Mumbai → Delhi
+Hyderabad → Agra
+Agra → Hyderabad
+Chandigarh → Mumbai
+Mumbai → Chandigarh
+Delhi → Hyderabad
+Hyderabad → Delhi
+Chandigarh → Bangalore
+Amritsar → Delhi
+

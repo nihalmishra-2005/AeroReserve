@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Search Flights | AirReserve</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg ar-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard"><span class="brand-icon"><i class="bi bi-airplane-fill"></i></span><span class="brand-text">Air<span class="brand-accent">Reserve</span></span></a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link active" href="/flights/search"><i class="bi bi-search me-1"></i>Search Flights</a></li>
+                <li class="nav-item"><a class="nav-link" href="/bookings/history"><i class="bi bi-ticket-perforated me-1"></i>My Bookings</a></li>
+                <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-house me-1"></i>Dashboard</a></li>
+                <li class="nav-item"><form th:action="@{/auth/logout}" method="post" class="d-inline"><button type="submit" class="btn btn-outline-light btn-sm ms-2"><i class="bi bi-box-arrow-right"></i></button></form></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="search-hero">
+    <div class="container position-relative">
+        <div class="text-center mb-5">
+            <h1 class="search-title">Where do you want to fly?</h1>
+            <p class="search-subtitle">Search from hundreds of routes and find your perfect flight</p>
+        </div>
+        <div class="search-card">
+            <form th:action="@{/flights/search}" method="post">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="search-label"><i class="bi bi-geo-alt-fill me-1"></i>From</label>
+                        <input type="text" name="from" id="fromInput" class="form-control search-input" placeholder="City (e.g. New Delhi)" required/>
+                    </div>
+                    <div class="col-md-1 text-center">
+                        <button type="button" class="btn btn-swap" id="swapBtn"><i class="bi bi-arrow-left-right"></i></button>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="search-label"><i class="bi bi-geo-alt me-1"></i>To</label>
+                        <input type="text" name="to" id="toInput" class="form-control search-input" placeholder="City (e.g. Mumbai)" required/>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="search-label"><i class="bi bi-calendar3 me-1"></i>Date</label>
+                        <input type="date" name="date" id="dateInput" class="form-control search-input" required/>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-search w-100"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <h3 class="section-heading mb-4"><i class="bi bi-fire me-2"></i>Popular Routes</h3>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="route-card" onclick="fillSearch('New Delhi','Mumbai')">
+                <div class="route-card-header"><span class="route-city">DEL</span><div class="route-arrow"><i class="bi bi-airplane-fill"></i></div><span class="route-city">BOM</span></div>
+                <div class="route-card-body"><p class="route-name">New Delhi → Mumbai</p><p class="route-price">From ₹4,500</p></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="route-card" onclick="fillSearch('Mumbai','Bangalore')">
+                <div class="route-card-header"><span class="route-city">BOM</span><div class="route-arrow"><i class="bi bi-airplane-fill"></i></div><span class="route-city">BLR</span></div>
+                <div class="route-card-body"><p class="route-name">Mumbai → Bangalore</p><p class="route-price">From ₹3,800</p></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="route-card" onclick="fillSearch('Hyderabad','New Delhi')">
+                <div class="route-card-header"><span class="route-city">HYD</span><div class="route-arrow"><i class="bi bi-airplane-fill"></i></div><span class="route-city">DEL</span></div>
+                <div class="route-card-body"><p class="route-name">Hyderabad → New Delhi</p><p class="route-price">From ₹4,700</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('swapBtn').addEventListener('click', function() {
+    const f = document.getElementById('fromInput'), t = document.getElementById('toInput');
+    const tmp = f.value; f.value = t.value; t.value = tmp;
+    this.style.transform = 'rotate(180deg)'; setTimeout(() => this.style.transform = '', 400);
+});
+function fillSearch(from, to) {
+    document.getElementById('fromInput').value = from;
+    document.getElementById('toInput').value = to;
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const d = new Date(); d.setDate(d.getDate() + 1);
+    document.getElementById('dateInput').value = d.toISOString().split('T')[0];
+    document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Complete Booking')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container py-5">
+  <div class="mb-4">
+    <div class="section-title">📋 PASSENGER DETAILS</div>
+    <h2 class="fw-bold">Complete Your <span style="color:#00d4ff;">Booking</span></h2>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="d-flex align-items-center gap-2 mb-5">
+    <div class="d-flex align-items-center gap-2">
+      <div class="rounded-circle d-flex align-items-center justify-content-center"
+           style="width:32px;height:32px;background:rgba(0,230,118,0.2);color:#00e676;font-weight:700;font-size:0.8rem;">✓</div>
+      <span class="text-muted small">Search</span>
+    </div>
+    <div style="flex:1;height:2px;background:rgba(0,230,118,0.3);"></div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="rounded-circle d-flex align-items-center justify-content-center"
+           style="width:32px;height:32px;background:rgba(0,230,118,0.2);color:#00e676;font-weight:700;font-size:0.8rem;">✓</div>
+      <span class="text-muted small">Seat</span>
+    </div>
+    <div style="flex:1;height:2px;background:rgba(0,212,255,0.3);"></div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="rounded-circle d-flex align-items-center justify-content-center"
+           style="width:32px;height:32px;background:var(--accent);color:#000;font-weight:700;font-size:0.8rem;">3</div>
+      <span class="fw-bold" style="color:#00d4ff;font-size:0.9rem;">Details</span>
+    </div>
+    <div style="flex:1;height:2px;background:rgba(255,255,255,0.1);"></div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="rounded-circle d-flex align-items-center justify-content-center"
+           style="width:32px;height:32px;background:rgba(255,255,255,0.08);color:#8892b0;font-weight:700;font-size:0.8rem;">4</div>
+      <span class="text-muted small">Confirm</span>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Passenger Form -->
+    <div class="col-lg-8">
+      <div class="card-dark p-4">
+        <h5 class="fw-bold mb-4" style="font-family:'Orbitron',sans-serif;">
+          <i class="bi bi-person me-2" style="color:#00d4ff;"></i>Passenger Information
+        </h5>
+
+        <form th:action="@{/bookings/confirm}" method="post">
+          <input type="hidden" name="flightId" th:value="${flight.id}"/>
+          <input type="hidden" name="seatId" th:value="${seat.id}"/>
+          <input type="hidden" name="classType" th:value="${seat.classType}"/>
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label-dark">FIRST NAME *</label>
+              <input type="text" name="passengerFirstName" class="form-control form-control-dark"
+                     th:value="${user.firstName}" required placeholder="First Name"/>
+            </div>
+            <div class="col-6">
+              <label class="form-label-dark">LAST NAME *</label>
+              <input type="text" name="passengerLastName" class="form-control form-control-dark"
+                     th:value="${user.lastName}" required placeholder="Last Name"/>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label-dark">EMAIL *</label>
+              <input type="email" name="passengerEmail" class="form-control form-control-dark"
+                     th:value="${user.email}" required/>
+            </div>
+            <div class="col-6">
+              <label class="form-label-dark">PHONE</label>
+              <input type="tel" name="passengerPhone" class="form-control form-control-dark"
+                     th:value="${user.phone}" placeholder="+91 98765 43210"/>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label-dark">PASSPORT / ID NUMBER</label>
+            <input type="text" name="passengerPassport" class="form-control form-control-dark"
+                   placeholder="Passport or National ID Number"/>
+          </div>
+
+          <!-- Payment Section (UI only) -->
+          <div class="p-4 rounded-3 mb-4" style="background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.15);">
+            <h6 class="fw-bold mb-3" style="color:#00d4ff;">
+              <i class="bi bi-credit-card me-2"></i>Payment Details
+            </h6>
+            <div class="mb-3">
+              <label class="form-label-dark">CARD NUMBER</label>
+              <input type="text" class="form-control form-control-dark" placeholder="4242 4242 4242 4242" maxlength="19"/>
+            </div>
+            <div class="row g-3">
+              <div class="col-6">
+                <label class="form-label-dark">EXPIRY DATE</label>
+                <input type="text" class="form-control form-control-dark" placeholder="MM / YY"/>
+              </div>
+              <div class="col-6">
+                <label class="form-label-dark">CVV</label>
+                <input type="text" class="form-control form-control-dark" placeholder="• • •" maxlength="3"/>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-accent w-100 py-3 fs-6">
+            <i class="bi bi-lock-fill me-2"></i>Confirm & Pay
+            <span th:text="' ₹' + ${#numbers.formatDecimal(seat.price, 0, 0)}"></span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-lg-4">
+      <div class="card-dark p-4 sticky-top" style="top:80px;">
+        <h5 class="fw-bold mb-4" style="font-family:'Orbitron',sans-serif;color:#00d4ff;">
+          Order Summary
+        </h5>
+
+        <!-- Route -->
+        <div class="text-center mb-4">
+          <div class="d-flex align-items-center justify-content-center gap-3">
+            <div>
+              <div style="font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:700;color:#00d4ff;"
+                   th:text="${flight.sourceAirportCode}">DEL</div>
+              <div class="small text-muted" th:text="${flight.sourceCity}"></div>
+            </div>
+            <div style="color:#00d4ff;font-size:1.5rem;">→</div>
+            <div>
+              <div style="font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:700;color:#00d4ff;"
+                   th:text="${flight.destinationAirportCode}">BOM</div>
+              <div class="small text-muted" th:text="${flight.destinationCity}"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,0.08);">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Flight</span>
+            <span th:text="${flight.flightNumber}"></span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Date</span>
+            <span th:text="${#temporals.format(flight.departureTime, 'dd MMM yyyy')}"></span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Departure</span>
+            <span th:text="${#temporals.format(flight.departureTime, 'HH:mm')}"></span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Seat</span>
+            <span class="fw-bold" th:text="${seat.seatNumber}">5A</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Class</span>
+            <span th:class="'fw-bold class-' + ${seat.classType.name().toLowerCase()}"
+                  th:text="${seat.classType}"></span>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted small">Fare</span>
+          <span th:text="'₹' + ${#numbers.formatDecimal(seat.price, 0, 0)}"></span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted small">Taxes & Fees</span>
+          <span>₹0</span>
+        </div>
+        <div class="d-flex justify-content-between pt-3 mt-2" style="border-top:1px solid rgba(255,255,255,0.1);">
+          <span class="fw-bold">Total</span>
+          <span class="price-tag fs-4" th:text="'₹' + ${#numbers.formatDecimal(seat.price, 0, 0)}"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Format card number input
+document.querySelector('input[placeholder*="4242"]').addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g,'').substring(0,16);
+  e.target.value = v.match(/.{1,4}/g)?.join(' ') || v;
+});
+</script>
+</body>
+</html>
